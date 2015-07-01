@@ -1,3 +1,5 @@
-require_relative './user_service'
+$LOAD_PATH.unshift File.expand_path( "../lib", __FILE__ )
 
-run UserService::API
+require 'pricing_service/api'
+
+run PricingService::API
