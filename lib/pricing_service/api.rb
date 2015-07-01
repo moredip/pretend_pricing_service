@@ -7,13 +7,16 @@ module PricingService
 
     helpers do
       def pricing_engine
-        PricingEngine.new
+        PricingEngine.with_cache
+      end
+
+      def number_to_currency
       end
     end
 
     get '/price/:sku' do
       sku = params[:sku]
-      price = pricing_engine.price_for(sku)
+      price = "%01.2f" % pricing_engine.price_for(sku)
       {
         sku: sku,
         price: price
