@@ -7,7 +7,7 @@ gem "rake"
 gem "grape"
 gem "sequel"
 
-gem 'thin'
+gem 'puma'
 
 gem "microscope_tracer"
 

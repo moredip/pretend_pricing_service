@@ -1,13 +1,6 @@
-require 'sequel'
-
 module PricingService
   class PriceCache
-    def self.from_database_url_env_var
-      new( ENV.fetch('DATABASE_URL') )
-    end
-
-    def initialize(url)
-      db = Sequel.connect(url,max_connections:20)
+    def initialize(db)
       @cache_table = db[:pricing_cache]
     end
 

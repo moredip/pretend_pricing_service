@@ -3,8 +3,8 @@ require 'pricing_service/price_cache'
 module PricingService
 
 class PricingEngine
-  def self.with_cache
-    new(PriceCache.from_database_url_env_var)
+  def self.with_cache(db)
+    new(PriceCache.new(db))
   end
 
   def initialize(price_cache)

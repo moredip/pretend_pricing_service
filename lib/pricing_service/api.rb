@@ -7,7 +7,7 @@ module PricingService
 
     helpers do
       def pricing_engine
-        PricingEngine.with_cache
+        PricingEngine.with_cache(DB)
       end
     end
 

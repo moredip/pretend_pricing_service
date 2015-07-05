@@ -9,5 +9,8 @@ if ENV['RACK_ENV'].downcase == 'development'
   puts "running in DEV MODE!"
 end
 
+require 'sequel'
+DB = Sequel.connect(ENV.fetch('DATABASE_URL'),max_connections:ENV.fetch('DB_POOL',5))
+
 use MicroscopeTracer::RackMiddleware
 run PricingService::API
