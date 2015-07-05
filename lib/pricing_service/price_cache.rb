@@ -7,7 +7,7 @@ module PricingService
     end
 
     def initialize(url)
-      db = Sequel.connect(url)
+      db = Sequel.connect(url,max_connections:20)
       @cache_table = db[:pricing_cache]
     end
 
