@@ -9,7 +9,7 @@ gem "sequel"
 
 gem 'puma'
 
-gem "microscope_tracer"
+gem 'microscope_tracer', '~> 0.1.0'
 
 group :production do
   gem 'pg'
