@@ -11,6 +11,10 @@ gem 'thin'
 
 gem "microscope_tracer"
 
+group :production do
+  gem 'pg'
+end
+
 group :development, :test do
   gem 'foreman'
   gem 'sqlite3'
