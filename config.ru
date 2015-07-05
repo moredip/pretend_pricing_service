@@ -12,5 +12,5 @@ end
 require 'sequel'
 DB = Sequel.connect(ENV.fetch('DATABASE_URL'),max_connections:ENV.fetch('DB_POOL',5))
 
-use MicroscopeTracer::RackMiddleware
+use MicroscopeTracer::RackMiddleware, "pricing-service"
 run PricingService::API
