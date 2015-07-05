@@ -7,6 +7,8 @@ gem "sequel"
 
 gem 'thin'
 
+gem "microscope_tracer"
+
 group :development, :test do
   gem 'foreman'
   gem 'dotenv'

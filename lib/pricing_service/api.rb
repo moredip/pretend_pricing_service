@@ -9,9 +9,6 @@ module PricingService
       def pricing_engine
         PricingEngine.with_cache
       end
-
-      def number_to_currency
-      end
     end
 
     get '/price/:sku' do
