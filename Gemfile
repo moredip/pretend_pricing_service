@@ -1,7 +1,9 @@
 # A sample Gemfile
 source "https://rubygems.org"
 
+gem 'dotenv'
 gem "rake"
+
 gem "grape"
 gem "sequel"
 
@@ -11,7 +13,6 @@ gem "microscope_tracer"
 
 group :development, :test do
   gem 'foreman'
-  gem 'dotenv'
   gem 'sqlite3'
 end
 
