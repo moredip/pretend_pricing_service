@@ -19,6 +19,8 @@ end
 group :development, :test do
   gem 'foreman'
   gem 'sqlite3'
+  gem 'rspec', '~> 3.3.0'
+  gem 'pry'
 end
 
 group :development do
