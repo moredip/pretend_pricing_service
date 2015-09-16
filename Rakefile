@@ -22,3 +22,9 @@ namespace :db do
     end
   end
 end
+
+desc "push to cloud foundry dev"
+task :deploy_dev do
+  sh "cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s development"
+  sh "cf push -n pretend-pricing-service-dev"
+end
