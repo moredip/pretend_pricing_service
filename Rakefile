@@ -31,8 +31,25 @@ end
 
 desc "push to cloud foundry"
 task :deploy, [:space, :host] do |t, args|
+  require 'json'
   sh "cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}"
-  sh "cf push -n #{args[:host]}"
+  sh "cf create-service elephantsql turtle pricing_db"
+  sh "cf create-service-key pricing_db pricing_db_key"
+  cf_stdout = `cf service-key pricing_db pricing_db_key`
+  key_json = cf_stdout.slice(cf_stdout.index('{')..-1)
+  puts key_json
+  db_url = JSON.parse(key_json)["uri"]
+  sh "cf push -n #{args[:host]} --no-start"
+  sh "cf set-env pretend-pricing-service DATABASE_URL #{db_url}"
+  sh "cf start pretend-pricing-service"
+end
+
+desc "delete app from cloud foundry"
+task :delete_app, [:space] do |t, args|
+  sh "cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}"
+  sh "cf delete-service-key -f pricing_db pricing_db_key"
+  sh "cf delete-service -f pricing_db"
+  sh "cf delete -f pretend-pricing-service"
 end
 
 task default: [:spec]
