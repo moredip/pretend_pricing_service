@@ -12,9 +12,7 @@ gem 'puma'
 gem 'microscope_tracer', '~> 0.2.0'
 #gem 'request_store'
 
-group :production do
-  gem 'pg'
-end
+gem 'pg'
 
 group :development, :test do
   gem 'foreman'
