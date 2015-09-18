@@ -12,20 +12,23 @@ task :server do
   exec "foreman start"
 end
 
+def migrate(db_url, version=nil)
+  require "sequel"
+  Sequel.extension :migration
+  db = Sequel.connect(db_url)
+  if version
+    puts "Migrating to version #{version}"
+    Sequel::Migrator.run(db, "db_migrations", target: version.to_i)
+  else
+    puts "Migrating to latest"
+    Sequel::Migrator.run(db, "db_migrations")
+  end
+end
+
 namespace :db do
   desc "Run migrations"
   task :migrate, [:version] => :dotenv do |t, args|
-
-    require "sequel"
-    Sequel.extension :migration
-    db = Sequel.connect(ENV.fetch("DATABASE_URL"))
-    if args[:version]
-      puts "Migrating to version #{args[:version]}"
-      Sequel::Migrator.run(db, "db_migrations", target: args[:version].to_i)
-    else
-      puts "Migrating to latest"
-      Sequel::Migrator.run(db, "db_migrations")
-    end
+    migrate(ENV.fetch("DATABASE_URL"), args[:version])
   end
 end
 
@@ -41,6 +44,7 @@ task :deploy, [:space, :host] do |t, args|
   db_url = JSON.parse(key_json)["uri"]
   sh "cf push -n #{args[:host]} --no-start"
   sh "cf set-env pretend-pricing-service DATABASE_URL #{db_url}"
+  migrate(db_url)
   sh "cf start pretend-pricing-service"
 end
 
