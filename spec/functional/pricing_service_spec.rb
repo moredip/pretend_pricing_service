@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'net/http'
 
-BASE_SERVICE_URI = "http://pretend-pricing-service-#{ENV['RACK_ENV']}.cfapps.io/"
+BASE_SERVICE_URI = "http://#{ENV['APP_NAME']}.cfapps.io/"
 
 describe PricingService do
   it "returns a price for a sweater" do

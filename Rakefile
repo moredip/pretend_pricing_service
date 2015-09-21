@@ -16,9 +16,12 @@ namespace :test do
 
     desc "run functional tests against a deployed service"
     task :functional => :dotenv do
-      Rake::Task["app:deploy"].invoke(ENV['RACK_ENV'], "pretend-pricing-service-#{ENV['RACK_ENV']}")
+      require 'securerandom'
+      app_name = "pretend-pricing-service-#{SecureRandom.hex(4)}"
+      ENV['APP_NAME'] = app_name
+      Rake::Task["app:deploy"].invoke(ENV['RACK_ENV'], app_name, app_name)
       Rake::Task["test:run_functional"].invoke()
-      Rake::Task["app:delete"].invoke(ENV['RACK_ENV'])
+      Rake::Task["app:delete"].invoke(ENV['RACK_ENV'], app_name)
     end
   rescue LoadError
   end
@@ -51,26 +54,31 @@ end
 
 namespace :app do
   desc "push to cloud foundry"
-  task :deploy, [:space, :host] do |t, args|
+  task :deploy, [:space, :app_name, :host] do |t, args|
     require 'json'
     sh "cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}"
-    sh "cf create-service elephantsql turtle pricing_db"
-    sh "cf create-service-key pricing_db pricing_db_key"
-    cf_stdout = `cf service-key pricing_db pricing_db_key`
+    app_name = args[:app_name]
+    db_name = "#{app_name}-db"
+    db_key_name = "#{db_name}_key"
+    sh "cf create-service elephantsql turtle #{db_name}" 
+    sh "cf create-service-key #{db_name} #{db_key_name}"
+    cf_stdout = `cf service-key #{db_name} #{db_key_name}`
     key_json = cf_stdout.slice(cf_stdout.index('{')..-1)
     db_url = JSON.parse(key_json)["uri"]
-    sh "cf push -n #{args[:host]} --no-start"
-    sh "cf set-env pretend-pricing-service DATABASE_URL #{db_url}"
+    sh "cf push #{app_name} -n #{args[:host]} --no-start"
+    sh "cf set-env #{app_name} DATABASE_URL #{db_url}"
     migrate(db_url)
-    sh "cf start pretend-pricing-service"
+    sh "cf start #{app_name}"
   end
 
   desc "delete app from cloud foundry"
-  task :delete, [:space] do |t, args|
+  task :delete, [:space, :app_name] do |t, args|
     sh "cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}"
-    sh "cf delete-service-key -f pricing_db pricing_db_key"
-    sh "cf delete-service -f pricing_db"
-    sh "cf delete -f pretend-pricing-service"
+    db_name = "#{args[:app_name]}-db"
+    db_key_name = "#{db_name}_key"
+    sh "cf delete-service-key -f #{db_name} #{db_key_name}"
+    sh "cf delete-service -f #{db_name}"
+    sh "cf delete -f #{args[:app_name]}"
   end
 end
 
