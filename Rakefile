@@ -32,6 +32,18 @@ namespace :db do
   end
 end
 
+desc "run functional tests against a deployed service"
+task :functional_tests => :dotenv do
+  Rake::Task["deploy"].invoke(ENV['RACK_ENV'], "pretend-pricing-service-#{ENV['RACK_ENV']}")
+  Rake::Task["functional"].invoke()
+  Rake::Task["delete_app"].invoke(ENV['RACK_ENV'])
+end
+
+
+RSpec::Core::RakeTask.new(:functional) do |spec|
+  spec.pattern = FileList['spec/functional/*_spec.rb']
+end
+
 desc "push to cloud foundry"
 task :deploy, [:space, :host] do |t, args|
   require 'json'

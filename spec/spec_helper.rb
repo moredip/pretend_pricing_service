@@ -1,10 +1,10 @@
-ENV['RACK_ENV'] ||= 'test'
-
 require 'grape'
 require 'pry'
 require 'sequel'
 require 'dotenv'
 Dotenv.load
+
+ENV['RACK_ENV'] ||= 'test'
 
 DB = Sequel.connect(ENV.fetch('DATABASE_URL'),max_connections:ENV.fetch('DB_POOL',5))
 
