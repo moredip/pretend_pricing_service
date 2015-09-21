@@ -13,17 +13,8 @@ namespace :spec do
       spec.pattern = FileList['spec/unit/*_spec.rb']
     end
 
-    RSpec::Core::RakeTask.new(:run_functional) do |spec|
+    RSpec::Core::RakeTask.new(:functional) do |spec|
       spec.pattern = FileList['spec/functional/*_spec.rb']
-    end
-
-    desc "run functional tests against a deployed service"
-    task :functional => :dotenv do
-      app_name = "pretend-pricing-service-#{SecureRandom.hex(4)}"
-      ENV['APP_NAME'] = app_name
-      Rake::Task["app:deploy"].invoke(ENV['RACK_ENV'], app_name, app_name)
-      Rake::Task["spec:run_functional"].invoke()
-      Rake::Task["app:delete"].invoke(ENV['RACK_ENV'], app_name)
     end
   rescue LoadError
   end
