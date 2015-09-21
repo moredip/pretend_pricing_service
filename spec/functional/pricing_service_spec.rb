@@ -6,6 +6,6 @@ describe PricingService do
   it "returns a price for a sweater" do
     uri = URI.parse(BASE_SERVICE_URI + 'price/sweater')
     response = Net::HTTP.get_response(uri)
-    expect(response.body).to start_with '{"sku":"swererweater"'
+    expect(response.body).to start_with '{"sku":"sweater"'
   end
 end
