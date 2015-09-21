@@ -1,13 +1,16 @@
 require 'rake'
 require 'dotenv/tasks'
+require 'securerandom'
+require "sequel"
+require 'json'
 
-namespace :test do
+namespace :spec do
   begin
     require 'rspec/core'
     require 'rspec/core/rake_task'
 
-    RSpec::Core::RakeTask.new(:spec) do |spec|
-      spec.pattern = FileList['spec/api/*_spec.rb']
+    RSpec::Core::RakeTask.new(:unit) do |spec|
+      spec.pattern = FileList['spec/unit/*_spec.rb']
     end
 
     RSpec::Core::RakeTask.new(:run_functional) do |spec|
@@ -16,11 +19,10 @@ namespace :test do
 
     desc "run functional tests against a deployed service"
     task :functional => :dotenv do
-      require 'securerandom'
       app_name = "pretend-pricing-service-#{SecureRandom.hex(4)}"
       ENV['APP_NAME'] = app_name
       Rake::Task["app:deploy"].invoke(ENV['RACK_ENV'], app_name, app_name)
-      Rake::Task["test:run_functional"].invoke()
+      Rake::Task["spec:run_functional"].invoke()
       Rake::Task["app:delete"].invoke(ENV['RACK_ENV'], app_name)
     end
   rescue LoadError
@@ -33,7 +35,6 @@ task :server do
 end
 
 def migrate(db_url, version=nil)
-  require "sequel"
   Sequel.extension :migration
   db = Sequel.connect(db_url)
   if version
@@ -55,12 +56,11 @@ end
 namespace :app do
   desc "push to cloud foundry"
   task :deploy, [:space, :app_name, :host] do |t, args|
-    require 'json'
     sh "cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}"
     app_name = args[:app_name]
     db_name = "#{app_name}-db"
     db_key_name = "#{db_name}_key"
-    sh "cf create-service elephantsql turtle #{db_name}" 
+    sh "cf create-service elephantsql turtle #{db_name}"
     sh "cf create-service-key #{db_name} #{db_key_name}"
     cf_stdout = `cf service-key #{db_name} #{db_key_name}`
     key_json = cf_stdout.slice(cf_stdout.index('{')..-1)
@@ -82,5 +82,5 @@ namespace :app do
   end
 end
 
-task default: ['test:spec']
+task default: ['spec:unit']
 
