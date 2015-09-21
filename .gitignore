@@ -2,3 +2,6 @@
 vendor/bundle
 
 pricing.db
+
+*.swp
+*.swo
