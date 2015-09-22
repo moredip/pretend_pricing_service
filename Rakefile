@@ -45,28 +45,28 @@ end
 namespace :app do
   desc "push to cloud foundry"
   task :deploy, [:space, :app_name, :host] do |t, args|
-    sh "cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}"
+    `cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}`
     app_name = args[:app_name]
     db_name = "#{app_name}-db"
     db_key_name = "#{db_name}_key"
-    sh "cf create-service elephantsql turtle #{db_name}"
-    sh "cf create-service-key #{db_name} #{db_key_name}"
+    `cf create-service elephantsql turtle #{db_name}`
+    `cf create-service-key #{db_name} #{db_key_name}`
     cf_stdout = `cf service-key #{db_name} #{db_key_name}`
     key_json = cf_stdout.slice(cf_stdout.index('{')..-1)
     db_url = JSON.parse(key_json)["uri"]
-    sh "cf push #{app_name} -n #{args[:host]} --no-start"
-    sh "cf set-env #{app_name} DATABASE_URL #{db_url}"
-    sh "cf push #{app_name} -n #{args[:host]} -c 'bundle exec rake db:migrate && bundle exec puma -C puma.rb'"
+    `cf push #{app_name} -n #{args[:host]} --no-start`
+    `cf set-env #{app_name} DATABASE_URL #{db_url} > /dev/null 2>&1`
+    `cf push #{app_name} -n #{args[:host]} -c 'bundle exec rake db:migrate && bundle exec puma -C puma.rb'`
   end
 
   desc "delete app from cloud foundry"
   task :delete, [:space, :app_name] do |t, args|
-    sh "cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}"
+    `cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}`
     db_name = "#{args[:app_name]}-db"
     db_key_name = "#{db_name}_key"
-    sh "cf delete-service-key -f #{db_name} #{db_key_name}"
-    sh "cf delete-service -f #{db_name}"
-    sh "cf delete -f #{args[:app_name]}"
+    `cf delete-service-key -f #{db_name} #{db_key_name}`
+    `cf delete-service -f #{db_name}`
+    `cf delete -f #{args[:app_name]}`
   end
 end
 
