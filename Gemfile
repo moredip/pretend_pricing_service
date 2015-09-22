@@ -20,6 +20,7 @@ group :development, :test do
   gem 'foreman'
   gem 'sqlite3'
   gem 'rspec', '~> 3.3.0'
+  gem 'ci_reporter_rspec'
   gem 'pry'
 end
 
