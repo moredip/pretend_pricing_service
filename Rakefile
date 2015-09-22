@@ -25,22 +25,20 @@ task :server do
   exec "foreman start"
 end
 
-def migrate(db_url, version=nil)
-  Sequel.extension :migration
-  db = Sequel.connect(db_url)
-  if version
-    puts "Migrating to version #{version}"
-    Sequel::Migrator.run(db, "db_migrations", target: version.to_i)
-  else
-    puts "Migrating to latest"
-    Sequel::Migrator.run(db, "db_migrations")
-  end
-end
-
 namespace :db do
   desc "Run migrations"
   task :migrate, [:version] => :dotenv do |t, args|
-    migrate(ENV.fetch("DATABASE_URL"), args[:version])
+    db_url = ENV.fetch("DATABASE_URL")
+    version = args[:version]
+    Sequel.extension :migration
+    db = Sequel.connect(db_url)
+    if version
+      puts "Migrating to version #{version}"
+      Sequel::Migrator.run(db, "db_migrations", target: version.to_i)
+    else
+      puts "Migrating to latest"
+      Sequel::Migrator.run(db, "db_migrations")
+    end
   end
 end
 
@@ -58,8 +56,7 @@ namespace :app do
     db_url = JSON.parse(key_json)["uri"]
     sh "cf push #{app_name} -n #{args[:host]} --no-start"
     sh "cf set-env #{app_name} DATABASE_URL #{db_url}"
-    migrate(db_url)
-    sh "cf start #{app_name}"
+    sh "cf push #{app_name} -n #{args[:host]} -c 'bundle exec rake db:migrate && bundle exec puma -C puma.rb'"
   end
 
   desc "delete app from cloud foundry"
