@@ -48,28 +48,40 @@ end
 namespace :app do
   desc "push to cloud foundry"
   task :deploy, [:space, :app_name, :host] do |t, args|
-    `cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}`
+    space = args[:space]
     app_name = args[:app_name]
+    host = args[:host]
     db_name = "#{app_name}-db"
     db_key_name = "#{db_name}_key"
-    `cf create-service elephantsql turtle #{db_name}`
-    `cf create-service-key #{db_name} #{db_key_name}`
+
+    puts "deploying..."
+    puts `cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
+    puts `cf create-service elephantsql turtle #{db_name}`
+    puts `cf create-service-key #{db_name} #{db_key_name}`
+
     cf_stdout = `cf service-key #{db_name} #{db_key_name}`
     key_json = cf_stdout.slice(cf_stdout.index('{')..-1)
     db_url = JSON.parse(key_json)["uri"]
-    `cf push #{app_name} -n #{args[:host]} --no-start`
+
+    puts `cf push #{app_name} -n #{host} --no-start`
     `cf set-env #{app_name} DATABASE_URL #{db_url} > /dev/null 2>&1`
-    `cf push #{app_name} -n #{args[:host]} -c 'bundle exec rake db:migrate && bundle exec puma -C puma.rb'`
+    puts `cf push #{app_name} -n #{host} -c 'bundle exec rake db:migrate && bundle exec puma -C puma.rb'`
+    puts "deployed"
   end
 
   desc "delete app from cloud foundry"
   task :delete, [:space, :app_name] do |t, args|
-    `cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{args[:space]}`
+    space = args[:space]
+    app_name = args[:app_name]
     db_name = "#{args[:app_name]}-db"
     db_key_name = "#{db_name}_key"
-    `cf delete-service-key -f #{db_name} #{db_key_name}`
-    `cf delete-service -f #{db_name}`
-    `cf delete -f #{args[:app_name]}`
+
+    puts "deleting..."
+    puts `cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
+    puts `cf delete-service-key -f #{db_name} #{db_key_name}`
+    puts `cf delete-service -f #{db_name}`
+    puts `cf delete -f #{app_name}`
+    puts "deleted"
   end
 end
 
