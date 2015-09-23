@@ -4,6 +4,8 @@ require 'microscope_tracer/rack_middleware'
 
 require 'pricing_service/api'
 
+ENV['RACK_ENV'] ||= "development"
+
 if ENV['RACK_ENV'].downcase == 'development'
   $stdout.sync = true
   puts "running in DEV MODE!"

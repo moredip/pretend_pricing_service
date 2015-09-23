@@ -4,7 +4,7 @@ require 'net/http'
 
 load File.expand_path("Rakefile")
 
-APP_NAME = "pretend-pricing-service-#{SecureRandom.hex(4)}"
+APP_NAME = ENV["APP_NAME"] || "pretend-pricing-service-#{SecureRandom.hex(4)}"
 
 RSpec.configure do |rspec|
   rspec.before(:suite) do
