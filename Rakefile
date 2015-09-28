@@ -55,7 +55,7 @@ namespace :app do
     db_key_name = "#{db_name}_key"
 
     puts "deploying..."
-    puts `cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
+    puts `cf login -a api.run.pivotal.io -u #{ENV['CF_USERNAME']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
     puts `cf create-service elephantsql turtle #{db_name}`
     puts `cf create-service-key #{db_name} #{db_key_name}`
 
@@ -77,7 +77,7 @@ namespace :app do
     db_key_name = "#{db_name}_key"
 
     puts "deleting..."
-    puts `cf login -a api.run.pivotal.io -u #{ENV['CF_EMAIL']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
+    puts `cf login -a api.run.pivotal.io -u #{ENV['CF_USERNAME']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
     puts `cf delete-service-key -f #{db_name} #{db_key_name}`
     puts `cf delete-service -f #{db_name}`
     puts `cf delete -f #{app_name}`
