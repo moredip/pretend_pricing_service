@@ -53,19 +53,20 @@ end
 
 namespace :app do
   desc "push to cloud foundry"
-  task :deploy, [:space, :app_name, :host] do |t, args|
+  task :deploy, [:space, :prefix] do |t, args|
     space = args[:space]
-    app_name = args[:app_name]
-    host = args[:host]
+    prefix = args[:prefix]
+    app_name = "#{prefix}_pricing"
     db_name = "#{app_name}-db"
 
     puts "deploying..."
     begin
       puts `cf login -a api.run.pivotal.io -u #{ENV['CF_USERNAME']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
       puts `cf create-service elephantsql turtle #{db_name}`
-      puts `cf push #{app_name} -n #{host} --no-start`
+      puts `cf push #{app_name} -n #{app_name} --no-start`
       puts `cf bind-service #{app_name} #{db_name}`
-      puts `cf push #{app_name} -n #{host} -c 'bundle exec rake db:migrate && bundle exec puma -C puma.rb'`
+      puts `cf push #{app_name} -n #{app_name} -c 'bundle exec rake db:migrate && bundle exec puma -C puma.rb'`
+      puts `cf cups #{app_name}_service -p '{"type":"pricing", "url":"http://#{app_name}.cfapps.io"}'`
     ensure
       puts `cf logout`
     end
@@ -73,14 +74,16 @@ namespace :app do
   end
 
   desc "delete app from cloud foundry"
-  task :delete, [:space, :app_name] do |t, args|
+  task :delete, [:space, :prefix] do |t, args|
     space = args[:space]
-    app_name = args[:app_name]
-    db_name = "#{args[:app_name]}-db"
+    prefix = args[:prefix]
+    app_name = "#{prefix}_pricing"
+    db_name = "#{app_name}-db"
 
     puts "deleting..."
     begin
       puts `cf login -a api.run.pivotal.io -u #{ENV['CF_USERNAME']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
+      puts `cf delete-service -f #{app_name}_service`
       puts `cf unbind-service #{app_name} #{db_name}`
       puts `cf delete-service -f #{db_name}`
       puts `cf delete -f #{app_name}`
