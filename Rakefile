@@ -31,7 +31,13 @@ end
 namespace :db do
   desc "Run migrations"
   task :migrate, [:version] => :dotenv do |t, args|
-    db_url = ENV.fetch("DATABASE_URL")
+    if ENV['VCAP_SERVICE']
+      VCAP_SERVICES = JSON.parse(ENV['VCAP_SERVICES'])
+      db_url = VCAP_SERVICES["elephantsql"][0]["credentials"]["uri"]
+    else
+      db_url = ENV.fetch("DATABASE_URL")
+    end
+
     version = args[:version]
     Sequel.extension :migration
     db = Sequel.connect(db_url)
@@ -52,20 +58,13 @@ namespace :app do
     app_name = args[:app_name]
     host = args[:host]
     db_name = "#{app_name}-db"
-    db_key_name = "#{db_name}_key"
 
     puts "deploying..."
     begin
       puts `cf login -a api.run.pivotal.io -u #{ENV['CF_USERNAME']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
       puts `cf create-service elephantsql turtle #{db_name}`
-      puts `cf create-service-key #{db_name} #{db_key_name}`
-
-      cf_stdout = `cf service-key #{db_name} #{db_key_name}`
-      key_json = cf_stdout.slice(cf_stdout.index('{')..-1)
-      db_url = JSON.parse(key_json)["uri"]
-
       puts `cf push #{app_name} -n #{host} --no-start`
-      `cf set-env #{app_name} DATABASE_URL #{db_url} > /dev/null 2>&1`
+      puts `cf bind-service #{app_name} #{db_name}`
       puts `cf push #{app_name} -n #{host} -c 'bundle exec rake db:migrate && bundle exec puma -C puma.rb'`
     ensure
       puts `cf logout`
@@ -78,12 +77,11 @@ namespace :app do
     space = args[:space]
     app_name = args[:app_name]
     db_name = "#{args[:app_name]}-db"
-    db_key_name = "#{db_name}_key"
 
     puts "deleting..."
     begin
       puts `cf login -a api.run.pivotal.io -u #{ENV['CF_USERNAME']} -p #{ENV['CF_PASSWORD']} -o TW-org -s #{space}`
-      puts `cf delete-service-key -f #{db_name} #{db_key_name}`
+      puts `cf unbind-service #{app_name} #{db_name}`
       puts `cf delete-service -f #{db_name}`
       puts `cf delete -f #{app_name}`
     ensure
