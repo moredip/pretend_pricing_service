@@ -5,6 +5,7 @@ require 'net/http'
 load File.expand_path("Rakefile")
 
 PREFIX = ENV["PREFIX"] || SecureRandom.hex(4)
+BASE_SERVICE_URI = "http://#{PREFIX}_pricing.cfapps.io/"
 
 RSpec.configure do |rspec|
   rspec.before(:suite) do
