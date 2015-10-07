@@ -12,6 +12,8 @@ gem 'puma'
 gem 'microscope_tracer', '~> 0.2.0'
 #gem 'request_store'
 
+gem 'cloudfoundry-deploy', :git => 'https://github.com/ThoughtWorks-AELab/cloudfoundry-deploy.git'
+
 group :production do
   gem 'pg'
 end

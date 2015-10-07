@@ -1,1 +1,1 @@
-web: bundle exec puma -C puma.rb
+web: "bundle exec rake db:migrate && bundle exec puma -C puma.rb"

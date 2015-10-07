@@ -1,0 +1,6 @@
+test:
+  app_suffix: pricing
+  org: TW-org
+  space: test
+  is_service: true
+  requires_postgres: true
