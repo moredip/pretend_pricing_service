@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ThoughtWorks-AELab/cloudfoundry-deploy.git
-  revision: 15697580369486a7491d93243f24b50f13aa5574
+  revision: 0563ea594edccbfefb79126c795e99ceb4588ed1
   specs:
     cloudfoundry-deploy (0.0.1)
 
