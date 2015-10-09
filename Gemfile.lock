@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ThoughtWorks-AELab/cloudfoundry-deploy.git
-  revision: 7fdc84231fc36b6ce1b2e305a3e0a39339a15f80
+  revision: bcf6d10bce91758054d92cff471848068d4252c4
   specs:
     cloudfoundry-deploy (0.0.1)
 
@@ -113,6 +113,3 @@ DEPENDENCIES
   rspec (~> 3.3.0)
   sequel
   sqlite3
-
-BUNDLED WITH
-   1.10.6
