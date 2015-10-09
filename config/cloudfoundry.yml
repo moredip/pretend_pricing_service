@@ -4,3 +4,9 @@ test:
   space: test
   is_service: true
   requires_postgres: true
+production:
+  app_suffix: pricing
+  org: TW-org
+  space: production
+  is_service: true
+  requires_postgres: true
