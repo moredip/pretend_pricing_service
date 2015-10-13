@@ -1,12 +1,17 @@
+defaults: &defaults
+  app_suffix: pricing
+  org: TW-org
+  is_service: true
+  requires_postgres: true
+
 test:
-  app_suffix: pricing
-  org: TW-org
+  <<: *defaults
   space: test
-  is_service: true
-  requires_postgres: true
+
+staging:
+  <<: *defaults
+  space: staging
+
 production:
-  app_suffix: pricing
-  org: TW-org
+  <<: *defaults
   space: production
-  is_service: true
-  requires_postgres: true
