@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e -u
 
-bundle install --path vendor/bundle
+bundle install --path vendor/bundle --without production
 bundle exec rake db:migrate
 RACK_ENV=test bundle exec rake db:migrate
