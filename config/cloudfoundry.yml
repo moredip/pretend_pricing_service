@@ -1,5 +1,5 @@
 defaults: &defaults
-  app_suffix: pricing
+  app_name: pricing
   org: TW-org
   is_service: true
   requires_postgres: true
