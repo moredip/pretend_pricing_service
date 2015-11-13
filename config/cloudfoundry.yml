@@ -15,3 +15,13 @@ staging:
 production:
   <<: *defaults
   space: production
+
+new:
+  app_name: pricing
+  org: idiots
+  is_service: true
+  space: test
+  api: api.system.tw-ael.net
+  skip_ssl: true
+  app_domain: apps.tw-ael.net
+  requires_mysql: true
