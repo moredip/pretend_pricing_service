@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e -u
 
-# make sure we're always running from the same directory, regardless of what the 
-# current working directory was when this script was run
-MY_DIR="$( cd "$( dirname "$0" )" && pwd )"
-ROOT_DIR="$MY_DIR/.."
-
-cd $ROOT_DIR
-bundle install --path=vendor/bundle
-
+bundle install --path vendor/bundle --without production
 bundle exec rake db:migrate
+RACK_ENV=test bundle exec rake db:migrate

@@ -12,11 +12,14 @@ if ENV['RACK_ENV'].downcase == 'development'
   puts "running in DEV MODE!"
   db_url = ENV['DATABASE_URL']
   max_connections = ENV.fetch('DB_POOL', 5)
-else
-  VCAP_SERVICES = JSON.parse(ENV['VCAP_SERVICES'])
-  db_credentials = VCAP_SERVICES["elephantsql"][0]["credentials"]
+elsif JSON.parse(ENV['VCAP_SERVICES']).has_key?("elephantsql")
+  db_credentials = JSON.parse(ENV['VCAP_SERVICES'])["elephantsql"][0]["credentials"]
   db_url = db_credentials["uri"]
   max_connections = db_credentials["max_conns"]
+else
+  db_credentials = JSON.parse(ENV['VCAP_SERVICES'])["p-mysql"][0]["credentials"]
+  db_url = db_credentials["uri"]
+  max_connections = 5
 end
 
 DB = Sequel.connect(db_url,max_connections:max_connections)
