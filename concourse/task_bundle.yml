@@ -2,7 +2,7 @@
 platform: linux
 image: docker:///ruby#2
 inputs: 
-  - name: git-deals
+  - name: git-pricing
     path: .
 run: 
   path: concourse/task_bundle.sh 

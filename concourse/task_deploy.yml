@@ -2,7 +2,7 @@
 platform: linux
 image: docker:///ruby#2
 inputs: 
-  - name: git-deals
+  - name: git-pricing
     path: .
   - name: bundle
     path: vendor/bundle
