@@ -7,8 +7,7 @@ inputs:
   - name: bundle
     path: vendor/bundle
 run: 
-  path: concourse/task_deploy.sh 
+  path: concourse/task_functional_tests.sh 
 params:
   CF_USERNAME:
   CF_PASSWORD:
-  CF_SPACE:
