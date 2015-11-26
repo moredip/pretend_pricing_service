@@ -1,0 +1,12 @@
+---
+platform: linux
+image: docker:///ruby#2
+inputs: 
+  - name: git-deals
+    path: .
+run: 
+  path: concourse/task_bundle.sh 
+
+outputs:
+  - name: bundle
+    path: vendor/bundle
