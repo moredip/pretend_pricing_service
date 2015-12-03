@@ -1,0 +1,15 @@
+---
+platform: linux
+image: docker:///ruby#2
+inputs: 
+  - name: git-pricing
+    path: .
+  - name: bundle
+    path: vendor/bundle
+run: 
+  path: concourse/task_deploy.sh
+params:
+  CF_USERNAME:
+  CF_PASSWORD:
+  CF_SPACE: test
+  ENV_POOL_NAME: cf-test-env
