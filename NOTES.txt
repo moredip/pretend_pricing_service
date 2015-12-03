@@ -1,2 +1,3 @@
 pricing service
  - random price per SKU/10 secs, cached in DB
+ 
