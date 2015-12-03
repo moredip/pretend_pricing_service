@@ -6,6 +6,7 @@ inputs:
     path: .
   - name: bundle
     path: vendor/bundle
+  - name: test-environments
 run: 
   path: concourse/task_functional_tests.sh 
 params:
